@@ -44,7 +44,15 @@ function redisKV(): RawKV {
       return ((await r.hget<string>(k, f)) as string | null) ?? null;
     },
     async hgetall(k) {
-      return ((await r.hgetall<Record<string, string>>(k)) as Record<string, string> | null) ?? {};
+      // automaticDeserialization:false bo'lganda Upstash [maydon, qiymat, ...] massiv qaytaradi
+      const res = (await r.hgetall(k)) as unknown;
+      if (!res) return {};
+      if (Array.isArray(res)) {
+        const o: Record<string, string> = {};
+        for (let i = 0; i + 1 < res.length; i += 2) o[String(res[i])] = res[i + 1] as string;
+        return o;
+      }
+      return res as Record<string, string>;
     },
     async hset(k, o) {
       if (Object.keys(o).length) await r.hset(k, o);
