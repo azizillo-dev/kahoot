@@ -43,3 +43,6 @@ next-env.d.ts
 
 # lokal ma'lumotlar bazasi
 /.data
+
+.vercel
+.env*
